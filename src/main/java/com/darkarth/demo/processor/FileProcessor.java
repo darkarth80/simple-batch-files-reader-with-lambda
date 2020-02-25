@@ -1,7 +1,5 @@
 package com.darkarth.demo.processor;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,8 +8,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.darkarth.demo.model.dto.SimpleDTO;
+import com.darkarth.demo.util.LineUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,24 +28,37 @@ public class FileProcessor {
     @Value("${app.conf.file.file-pattern}")
     private String filePattern;
 
+    @Autowired
+    private LineUtil lu;
+
     public void processFiles() {
 
-        List<Path> paths = getPaths();
-
-        for (Path path : paths) {
-            try (Stream<String> line = Files.lines(path)) {
-                
-            } catch (IOException e) {
-                LOGGER.error("There has been an error while loading files.", e);
-            }
+        for (Path path : getPaths()) {
+            processFile(path);
         }
 
+    }
+
+    private void processFile(Path path) {
+        try (Stream<String> line = Files.lines(path)) {
+            List<SimpleDTO> list = line
+            .map(
+                p -> lu.transform(p)
+            )
+            .filter(
+                o -> o != null
+            ).collect(Collectors.toList());
+        } catch (IOException e) {
+            LOGGER.error("There has been an error while loading files.", e);
+        }
     }
 
     private List<Path> getPaths() {
         try (Stream<Path> walk = Files.walk(Paths.get(baseDir))) {
 
-            return walk.filter(p -> filter(p.getFileName().toString())).collect(Collectors.toList());
+            return walk.filter(
+                p -> filterFilesByName(p.getFileName().toString())
+            ).collect(Collectors.toList());
     
         } catch (IOException e) {
             LOGGER.error("There has been an error while loading files.", e);
@@ -51,7 +66,7 @@ public class FileProcessor {
         }
     }
 
-    private boolean filter(String name) {
+    private boolean filterFilesByName(String name) {
         boolean valid = false;
         valid = name.matches(filePattern);
         if (valid) {
