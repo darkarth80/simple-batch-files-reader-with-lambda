@@ -21,12 +21,13 @@ public class LineUtil {
     private final String NAME_KEY = "name";
     private final String DATE_KEY = "date";
     private final String TYPE_KEY = "type";
-    private final String EQUALS_SEPARATOR = "=";
+    private final String TOKEN_SEPARATOR = "|";
+    private final String KEY_VALUE_SEPARATOR = "=";
     private final String BASE_MSG = "The line format is incorrect.";
 
     public SimpleDTO transform(String line) {
         try {
-            return createObject(getMap(line.split("|")));
+            return createObject(getMap(line.split(TOKEN_SEPARATOR)));
         } catch(Exception e) {
             return null;
         }
@@ -49,7 +50,7 @@ public class LineUtil {
 
         Map<String, String> map = Arrays.stream(content)
         .map(
-            s -> s.split(EQUALS_SEPARATOR)
+            s -> s.split(KEY_VALUE_SEPARATOR)
         ).collect(
             Collectors.toMap(
                 a -> validateKey(a[0]), 
@@ -67,7 +68,6 @@ public class LineUtil {
             !key.equals(ID_KEY) && 
             !key.equals(NAME_KEY) && 
             !key.equals(DATE_KEY) && 
-            !key.equals(EQUALS_SEPARATOR) &&
             !key.equals(TYPE_KEY)
         ) {
             throw new UncheckedException("EX02", BASE_MSG, String.format("The key %s is not a valid key.", key), LOGGER);

@@ -67,14 +67,13 @@ public class FileProcessor {
     }
 
     private boolean filterFilesByName(String name) {
-        boolean valid = false;
-        valid = name.matches(filePattern);
-        if (valid) {
+        if (name.matches(filePattern)) {
             LOGGER.debug("File {} matched the regex.", name);
+            return true;
         } else {
             LOGGER.debug("File {} not matched the regex.", name);
+            return false;
         }
-        return valid;
     }
 
 }
