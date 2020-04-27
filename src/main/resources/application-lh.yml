@@ -1,0 +1,22 @@
+spring:
+  profiles: lh
+
+server:
+  port: 6080
+
+logging:
+  file: /home/darkarth/dev/logs/spring-boot/${spring.application.name}.log
+  level:
+    root: INFO
+    com.darkarth.demo: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.kafka: DEBUG
+
+# Custom Properties
+app:
+  conf:
+    scheduler:
+      retryJobCron: "*/10 * * * * *"
+      retryJobFixedRate: 10000
+    file:
+      base-dir: "/home/darkarth/dev/tests/files/audit-trails"

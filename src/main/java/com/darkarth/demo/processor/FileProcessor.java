@@ -1,11 +1,14 @@
 package com.darkarth.demo.processor;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.darkarth.demo.model.dto.SimpleDTO;
@@ -40,20 +43,34 @@ public class FileProcessor {
     }
 
     private void processFile(Path path) {
-        try (Stream<String> line = Files.lines(path)) {
-            List<SimpleDTO> list = line
-            .map(
-                p -> lu.transform(p)
+        try (Stream<String> line = Files.lines(path, StandardCharsets.UTF_8)) {
+            // List<SimpleDTO> list = line
+            // .map(
+            //     p -> lu.transform(p)
+            // )
+            // .filter(
+            //     o -> o != null
+            // ).collect(Collectors.toList());
+            // LOGGER.debug("list-values-length: {}", list.size());
+
+            List<String> lst = line.collect(Collectors.toList());
+            List<SimpleDTO> list = IntStream.range(0, lst.size())
+            .mapToObj(
+                i -> lu.transform(lst.get(i))
             )
             .filter(
                 o -> o != null
             ).collect(Collectors.toList());
+            LOGGER.debug("list-values-length: {}", list.size());
+
         } catch (IOException e) {
             LOGGER.error("There has been an error while loading files.", e);
         }
     }
 
     private List<Path> getPaths() {
+        LOGGER.debug("Setting: baseDir: {}", baseDir);
+
         try (Stream<Path> walk = Files.walk(Paths.get(baseDir))) {
 
             return walk.filter(

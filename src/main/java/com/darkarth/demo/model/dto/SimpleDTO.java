@@ -1,13 +1,15 @@
 package com.darkarth.demo.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.darkarth.demo.util.enumeration.Type;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class SimpleDTO {
-
+    
     @JsonProperty()
     private String id;
 
