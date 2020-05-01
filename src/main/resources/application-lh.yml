@@ -17,6 +17,6 @@ app:
   conf:
     scheduler:
       retryJobCron: "*/10 * * * * *"
-      retryJobFixedRate: 10000
+      retryJobFixedRate: 30000
     file:
       base-dir: "/home/darkarth/dev/tests/files/audit-trails"

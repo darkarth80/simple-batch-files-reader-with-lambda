@@ -1,16 +1,17 @@
 package com.darkarth.demo.processor;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import com.darkarth.demo.exception.UncheckedException;
 import com.darkarth.demo.model.dto.SimpleDTO;
 import com.darkarth.demo.util.LineUtil;
 
@@ -44,27 +45,18 @@ public class FileProcessor {
 
     private void processFile(Path path) {
         try (Stream<String> line = Files.lines(path, StandardCharsets.UTF_8)) {
-            // List<SimpleDTO> list = line
-            // .map(
-            //     p -> lu.transform(p)
-            // )
-            // .filter(
-            //     o -> o != null
-            // ).collect(Collectors.toList());
-            // LOGGER.debug("list-values-length: {}", list.size());
-
-            List<String> lst = line.collect(Collectors.toList());
-            List<SimpleDTO> list = IntStream.range(0, lst.size())
-            .mapToObj(
-                i -> lu.transform(lst.get(i))
+            AtomicInteger idx = new AtomicInteger();
+            List<SimpleDTO> list = line
+            .map(
+                l -> validate(l, path.toString(), idx.getAndIncrement())
             )
             .filter(
-                o -> o != null
+                Objects::nonNull
             ).collect(Collectors.toList());
             LOGGER.debug("list-values-length: {}", list.size());
 
         } catch (IOException e) {
-            LOGGER.error("There has been an error while loading files.", e);
+            LOGGER.error("There has been an error while processing files.", e);
         }
     }
 
@@ -90,6 +82,15 @@ public class FileProcessor {
         } else {
             LOGGER.debug("File {} not matched the regex.", name);
             return false;
+        }
+    }
+
+    public SimpleDTO validate(String line, String path, int idx) {
+        try {
+            return lu.transform(line);
+        } catch (UncheckedException e) {
+            LOGGER.debug(String.format("There was an error in file %s on line %d will be excluded from processing.", path, idx), e);
+            return null;
         }
     }
 
