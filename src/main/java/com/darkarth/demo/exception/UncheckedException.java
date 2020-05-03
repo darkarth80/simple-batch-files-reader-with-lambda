@@ -21,7 +21,7 @@ public class UncheckedException extends RuntimeException {
         super(String.format(BASE_MSG, errorCode, exMsg, msg));
         this.errorCode = errorCode;
         LOGGER = logger;
-        LOGGER.error(this.getLocalizedMessage());
+        LOGGER.info(this.getLocalizedMessage());
     }
 
     /**
@@ -35,7 +35,7 @@ public class UncheckedException extends RuntimeException {
         super(String.format(BASE_MSG, errorCode, exMsg, msg), t);
         this.errorCode = errorCode;
         LOGGER = logger;
-        LOGGER.error(this.getLocalizedMessage());
+        LOGGER.info(this.getLocalizedMessage());
     }
 
     /**

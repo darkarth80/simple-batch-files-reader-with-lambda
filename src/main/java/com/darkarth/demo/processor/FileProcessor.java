@@ -1,5 +1,6 @@
 package com.darkarth.demo.processor;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,7 +46,7 @@ public class FileProcessor {
 
     private void processFile(Path path) {
         try (Stream<String> line = Files.lines(path, StandardCharsets.UTF_8)) {
-            AtomicInteger idx = new AtomicInteger();
+            AtomicInteger idx = new AtomicInteger(1);
             List<SimpleDTO> list = line
             .map(
                 l -> validate(l, path.toString(), idx.getAndIncrement())
@@ -66,7 +67,7 @@ public class FileProcessor {
         try (Stream<Path> walk = Files.walk(Paths.get(baseDir))) {
 
             return walk.filter(
-                p -> filterFilesByName(p.getFileName().toString())
+                p -> filterFilesByName(p.toFile())
             ).collect(Collectors.toList());
     
         } catch (IOException e) {
@@ -75,14 +76,18 @@ public class FileProcessor {
         }
     }
 
-    private boolean filterFilesByName(String name) {
-        if (name.matches(filePattern)) {
-            LOGGER.debug("File {} matched the regex.", name);
-            return true;
-        } else {
-            LOGGER.debug("File {} not matched the regex.", name);
-            return false;
+    private boolean filterFilesByName(File file) {
+        boolean valid = false;
+        if (!file.isDirectory()) {
+            if (file.getName().matches(filePattern)) {
+                LOGGER.debug("File {} matched the regex.", file.getName());
+                valid = true;
+            } else {
+                LOGGER.debug("File {} not matched the regex.", file.getName());
+                valid = false;
+            }
         }
+        return valid;
     }
 
     public SimpleDTO validate(String line, String path, int idx) {

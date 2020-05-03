@@ -2,7 +2,6 @@ package com.darkarth.demo.util;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -35,11 +34,7 @@ public class LineUtil {
     private String tokenSeparator;
 
     public SimpleDTO transform(String line/*, Consumer<Integer> consumer*/) {
-        // try {
-            return createObject(getMap(line.split(Pattern.quote(tokenSeparator))));
-        // } catch(Exception e) {
-        //     return null;
-        // }
+        return createObject(getMap(line.split(Pattern.quote(tokenSeparator))));
     }
 
     private SimpleDTO createObject(Map<String, String> map) {
